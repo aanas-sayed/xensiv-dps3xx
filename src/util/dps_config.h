@@ -1,7 +1,7 @@
 
 #ifndef DPS_CONSTS_H_
 #define DPS_CONSTS_H_
-#include "util/DpsRegister.h"
+#include "DpsRegister.h"
 
 ///////////     DPS3xx    ///////////
 #define DPS3xx__PROD_ID 0x00
@@ -59,69 +59,65 @@
 #define DPS__FAIL_TOOBUSY -3
 #define DPS__FAIL_UNFINISHED -4
 
-namespace dps
+/**
+ * @brief Operating mode.
+ *
+ */
+enum Mode
 {
+    IDLE = 0x00,
+    CMD_PRS = 0x01,
+    CMD_TEMP = 0x02,
+    CMD_BOTH = 0x03, // only for DPS422
+    CONT_PRS = 0x05,
+    CONT_TMP = 0x06,
+    CONT_BOTH = 0x07
+};
 
-    /**
-     * @brief Operating mode.
-     *
-     */
-    enum Mode
-    {
-        IDLE = 0x00,
-        CMD_PRS = 0x01,
-        CMD_TEMP = 0x02,
-        CMD_BOTH = 0x03, // only for DPS422
-        CONT_PRS = 0x05,
-        CONT_TMP = 0x06,
-        CONT_BOTH = 0x07
-    };
+enum RegisterBlocks_e
+{
+    PRS = 0, // pressure value
+    TEMP,    // temperature value
+};
 
-    enum RegisterBlocks_e
-    {
-        PRS = 0, // pressure value
-        TEMP,    // temperature value
-    };
+const RegBlock_t registerBlocks[2] = {
+    {0x00, 3},
+    {0x03, 3},
+};
 
-    const RegBlock_t registerBlocks[2] = {
-        {0x00, 3},
-        {0x03, 3},
-    };
+/**
+ * @brief registers for configuration and flags; these are the same for both 3xx and 422, might need to be adapted for future sensors
+ *
+ */
+enum Config_Registers_e
+{
+    TEMP_MR = 0, // temperature measure rate
+    TEMP_OSR,    // temperature measurement resolution
+    PRS_MR,      // pressure measure rate
+    PRS_OSR,     // pressure measurement resolution
+    MSR_CTRL,    // measurement control
+    FIFO_EN,
 
-    /**
-     * @brief registers for configuration and flags; these are the same for both 3xx and 422, might need to be adapted for future sensors
-     *
-     */
-    enum Config_Registers_e
-    {
-        TEMP_MR = 0, // temperature measure rate
-        TEMP_OSR,    // temperature measurement resolution
-        PRS_MR,      // pressure measure rate
-        PRS_OSR,     // pressure measurement resolution
-        MSR_CTRL,    // measurement control
-        FIFO_EN,
+    TEMP_RDY,
+    PRS_RDY,
+    INT_FLAG_FIFO,
+    INT_FLAG_TEMP,
+    INT_FLAG_PRS,
+};
 
-        TEMP_RDY,
-        PRS_RDY,
-        INT_FLAG_FIFO,
-        INT_FLAG_TEMP,
-        INT_FLAG_PRS,
-    };
+const RegMask_t config_registers[NUM_OF_COMMON_REGMASKS] = {
+    {0x07, 0x70, 4}, // TEMP_MR
+    {0x07, 0x07, 0}, // TEMP_OSR
+    {0x06, 0x70, 4}, // PRS_MR
+    {0x06, 0x07, 0}, // PRS_OSR
+    {0x08, 0x07, 0}, // MSR_CTRL
+    {0x09, 0x02, 1}, // FIFO_EN
 
-    const RegMask_t config_registers[NUM_OF_COMMON_REGMASKS] = {
-        {0x07, 0x70, 4}, // TEMP_MR
-        {0x07, 0x07, 0}, // TEMP_OSR
-        {0x06, 0x70, 4}, // PRS_MR
-        {0x06, 0x07, 0}, // PRS_OSR
-        {0x08, 0x07, 0}, // MSR_CTRL
-        {0x09, 0x02, 1}, // FIFO_EN
+    {0x08, 0x20, 5}, // TEMP_RDY
+    {0x08, 0x10, 4}, // PRS_RDY
+    {0x0A, 0x04, 2}, // INT_FLAG_FIFO
+    {0x0A, 0x02, 1}, // INT_FLAG_TEMP
+    {0x0A, 0x01, 0}, // INT_FLAG_PRS
+};
 
-        {0x08, 0x20, 5}, // TEMP_RDY
-        {0x08, 0x10, 4}, // PRS_RDY
-        {0x0A, 0x04, 2}, // INT_FLAG_FIFO
-        {0x0A, 0x02, 1}, // INT_FLAG_TEMP
-        {0x0A, 0x01, 0}, // INT_FLAG_PRS
-    };
-
-} // namespace dps
 #endif /* DPS_CONSTS_H_ */

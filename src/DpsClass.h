@@ -14,17 +14,6 @@
 #ifndef DPSCLASS_H_INCLUDED
 #define DPSCLASS_H_INCLUDED
 
-#include <Arduino.h>
-
-// Disable SPI for currently not supported platforms.
-#if defined(ARDUINO_ARCH_SAMD) || defined(ARDUINO_ARCH_RENESAS)
-#define DPS_DISABLESPI
-#endif
-
-#ifndef DPS_DISABLESPI
-#include <SPI.h>
-#endif
-#include <Wire.h>
 #include "util/dps_config.h"
 
 class DpsClass
@@ -36,36 +25,17 @@ public:
     ~DpsClass(void);
 
     /**
-     * I2C begin function with standard address
-     */
-    void begin(TwoWire &bus);
-
-    /**
-     * Standard I2C begin function
-     *
-     * @param &bus:             I2CBus which connects MC to the sensor
-     * @param slaveAddress:     I2C address of the sensor (0x77 or 0x76)
-     */
-    void begin(TwoWire &bus, uint8_t slaveAddress);
-
-#ifndef DPS_DISABLESPI
-    /**
      * SPI begin function for Dps3xx with 4-wire SPI
      */
-    void begin(SPIClass &bus, int32_t chipSelect);
-#endif
+    void begin();
 
-#ifndef DPS_DISABLESPI
     /**
      * Standard SPI begin function
      *
-     * @param &bus:             SPI bus which connects MC to Dps3xx
-     * @param chipSelect:       Number of the CS line for the Dps3xx
      * @param threeWire:        1 if Dps3xx is connected with 3-wire SPI
      *                          0 if Dps3xx is connected with 4-wire SPI (standard)
      */
-    void begin(SPIClass &bus, int32_t chipSelect, uint8_t threeWire);
-#endif
+    void begin(uint8_t threeWire);
 
     /**
      * End function for Dps3xx
@@ -105,7 +75,7 @@ public:
      * @param oversamplingRate:     DPS__OVERSAMPLING_RATE_1, DPS__OVERSAMPLING_RATE_2,
      *                              DPS__OVERSAMPLING_RATE_4 ... DPS__OVERSAMPLING_RATE_128,
      *                              which are defined as integers 0 - 7
-     *                              The number of measurements equals to 2^n, if the value written to 
+     *                              The number of measurements equals to 2^n, if the value written to
      *                              the register field is n. 2^n internal measurements are combined to
      *                              return a more exact measurement
      * @return   status code
@@ -241,7 +211,7 @@ protected:
     // scaling factor table
     static const int32_t scaling_facts[DPS__NUM_OF_SCAL_FACTS];
 
-    dps::Mode m_opMode;
+    Mode m_opMode;
 
     // flags
     uint8_t m_initFail;
@@ -267,19 +237,9 @@ protected:
     // last measured scaled temperature (necessary for pressure compensation)
     float m_lastTempScal;
 
-    // bus specific
-    uint8_t m_SpiI2c; // 0=SPI, 1=I2C
-
-    // used for I2C
-    TwoWire *m_i2cbus;
-    uint8_t m_slaveAddress;
-
-#ifndef DPS_DISABLESPI
     // used for SPI
-    SPIClass *m_spibus;
-    int32_t m_chipSelect;
+    struct spi_dt_spec *m_spibus;
     uint8_t m_threeWire;
-#endif
     /**
      * Initializes the sensor.
      * This function has to be called from begin()
@@ -373,26 +333,15 @@ protected:
     int16_t getContResults(float *tempBuffer, uint8_t &tempCount, float *prsBuffer, uint8_t &prsCount, RegMask_t reg);
 
     /**
-     * reads a byte from the sensor
+     * reads a byte from the sensor via SPI
      *
      * @param regAddress:        Address that has to be read
      * @return  register content or -1 on fail
      */
     int16_t readByte(uint8_t regAddress);
 
-#ifndef DPS_DISABLESPI
     /**
-     * reads a byte from the sensor via SPI
-     * this function is automatically called by readByte
-     * if the sensor is connected via SPI
-     *
-     * @param regAddress:       Address that has to be read
-     * @return  register content or -1 on fail
-     */
-    int16_t readByteSPI(uint8_t regAddress);
-#endif
-    /**
-     * reads a block from the sensor
+     * reads a block from the sensor via SPI
      *
      * @param regAddress:       Address that has to be read
      * @param length:           Length of data block
@@ -401,17 +350,6 @@ protected:
      */
     int16_t readBlock(RegBlock_t regBlock, uint8_t *buffer);
 
-#ifndef DPS_DISABLESPI
-    /**
-     * reads a block from the sensor via SPI
-     *
-     * @param regAddress:       Address that has to be read
-     * @param length:           Length of data block
-     * @param readBuffer:       Buffer where data will be stored
-     * @return  number of bytes that have been read successfully, which might not always equal to length due to rx-Buffer overflow etc.
-     */
-    int16_t readBlockSPI(RegBlock_t regBlock, uint8_t *readBuffer);
-#endif
     /**
      * writes a byte to a given register of the sensor without checking
      *
@@ -423,19 +361,6 @@ protected:
     int16_t writeByte(uint8_t regAddress, uint8_t data);
 
     /**
-     * writes a byte to a register of the sensor
-     *
-     * @param regAddress:       Address of the register that has to be updated
-     * @param data:             Byte that will be written to the register
-     * @param check:            If this is true, register content will be read after writing
-     *                          to check if update was successful
-     * @return  0 if byte was written successfully or
-     *          -1 on fail
-     */
-    int16_t writeByte(uint8_t regAddress, uint8_t data, uint8_t check);
-
-#ifndef DPS_DISABLESPI
-    /**
      * writes a byte to a register of the sensor via SPI
      *
      * @param regAddress:       Address of the register that has to be updated
@@ -445,8 +370,7 @@ protected:
      * @return  0 if byte was written successfully or
      *          -1 on fail
      */
-    int16_t writeByteSpi(uint8_t regAddress, uint8_t data, uint8_t check);
-#endif
+    int16_t writeByte(uint8_t regAddress, uint8_t data, uint8_t check);
 
     /**
      * updates a bit field of the sensor without checking
