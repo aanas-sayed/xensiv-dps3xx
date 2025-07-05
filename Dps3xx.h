@@ -10,12 +10,15 @@
  *
  * Have a look at the datasheet for more information.
  */
-
-#ifndef DPSCLASS_H_INCLUDED
-#define DPSCLASS_H_INCLUDED
+#ifndef DPS3xx_H_
+#define DPS3xx_H_
 
 #include <stdint.h>
 #include "util/dps_config.h"
+#include "util/dps3xx_config.h"
+#include "util/DpsRegister.h"
+
+extern struct Dps3xxDev dps3xx_dev;
 
 /*!
  * @brief Dps3xx device structure
@@ -25,7 +28,7 @@ struct Dps3xxDev
     // scaling factor table
     const int32_t scaling_facts[DPS__NUM_OF_SCAL_FACTS];
 
-    Mode m_opMode;
+    enum Mode m_opMode;
 
     // flags
     uint8_t m_initFail;
@@ -56,6 +59,12 @@ struct Dps3xxDev
     // used for SPI
     struct spi_dt_spec *m_spibus;
     uint8_t m_threeWire;
+
+    uint8_t m_tempSensor;
+
+    // compensation coefficients
+    int32_t m_c0Half;
+    int32_t m_c1;
 };
 
 /**
@@ -83,10 +92,10 @@ int16_t dps3xx_standby(struct Dps3xxDev *dps3xx_dev);
 /**
  * performs one temperature measurement
  *
- * @param results:      pointer to a float value where the result will be written
+ * @param result:      pointer to a float value where the result will be written
  * @return 	status code
  */
-int16_t dps3xx_measure_temp_once(struct Dps3xxDev *dps3xx_dev, float *results);
+int16_t dps3xx_measure_temp_once(struct Dps3xxDev *dev, float *result);
 
 /**
  * performs one temperature measurement with specified oversamplingRate
@@ -100,7 +109,7 @@ int16_t dps3xx_measure_temp_once(struct Dps3xxDev *dps3xx_dev, float *results);
  *                              return a more exact measurement
  * @return   status code
  */
-int16_t dps3xx_measure_temp_once(struct Dps3xxDev *dps3xx_dev, float *result, uint8_t oversamplingRate);
+int16_t dps3xx_measure_temp_once_with_osr(struct Dps3xxDev *dps3xx_dev, float *result, uint8_t oversamplingRate);
 
 /**
  * starts a single temperature measurement
@@ -116,7 +125,7 @@ int16_t dps3xx_start_measure_temp_once(struct Dps3xxDev *dps3xx_dev);
  *                              DPS__OVERSAMPLING_RATE_4 ... DPS__OVERSAMPLING_RATE_128, which are defined as integers 0 - 7
  * @return  status code
  */
-int16_t dps3xx_start_measure_temp_once(struct Dps3xxDev *dps3xx_dev, uint8_t oversamplingRate);
+int16_t dps3xx_start_measure_temp_once_with_osr(struct Dps3xxDev *dps3xx_dev, uint8_t oversamplingRate);
 
 /**
  * performs one pressure measurement
@@ -134,7 +143,7 @@ int16_t dps3xx_measure_pressure_once(struct Dps3xxDev *dps3xx_dev, float *result
  *                              DPS__OVERSAMPLING_RATE_4 ... DPS__OVERSAMPLING_RATE_128
  * @return  status code
  */
-int16_t dps3xx_measure_pressure_once(struct Dps3xxDev *dps3xx_dev, float *result, uint8_t oversamplingRate);
+int16_t dps3xx_measure_pressure_once_with_osr(struct Dps3xxDev *dps3xx_dev, float *result, uint8_t oversamplingRate);
 
 /**
  * starts a single pressure measurement
@@ -150,7 +159,7 @@ int16_t dps3xx_start_measure_pressure_once(struct Dps3xxDev *dps3xx_dev);
  *                              DPS__OVERSAMPLING_RATE_4 ... DPS__OVERSAMPLING_RATE_128
  * @return  status code
  */
-int16_t dps3xx_start_measure_pressure_once(struct Dps3xxDev *dps3xx_dev, uint8_t oversamplingRate);
+int16_t dps3xx_start_measure_pressure_once_with_osr(struct Dps3xxDev *dps3xx_dev, uint8_t oversamplingRate);
 
 /**
  * gets the result a single temperature or pressure measurement in °C or Pa
@@ -158,7 +167,7 @@ int16_t dps3xx_start_measure_pressure_once(struct Dps3xxDev *dps3xx_dev, uint8_t
  * @param result:              reference to a float value where the result will be written
  * @return 	status code
  */
-int16_t dps3xx_getSingleResult(struct Dps3xxDev *dps3xx_dev, float *result);
+int16_t dps3xx_get_single_result(struct Dps3xxDev *dps3xx_dev, float *result);
 
 /**
  * starts a continuous temperature measurement with specified measurement rate and oversampling rate
@@ -227,25 +236,37 @@ int16_t dps3xx_get_int_status_prs_ready(struct Dps3xxDev *dps3xx_dev);
  */
 int16_t dps3xx_correct_temp(struct Dps3xxDev *dps3xx_dev);
 
-// /**
-//  * Initializes the sensor.
-//  * This function has to be called from begin()
-//  * and requires a valid bus initialization.
-//  */
-// virtual void init(void) = 0;
+/**
+ * @brief Set the source of interrupt (FIFO full, measurement values ready)
+ *
+ * @param intr_source Interrupt source as defined by Interrupt_source_3xx_e
+ * @return status code
+ */
+int16_t dps3xx_set_interrupt_sources(struct Dps3xxDev *dps3xx_dev, uint8_t intr_source);
 
-// /**
-//  * reads the compensation coefficients from the sensor
-//  * this is called once from init(), which is called from begin()
-//  *
-//  * @return 	0 on success, -1 on fail
-//  */
-// virtual int16_t readcoeffs(void) = 0;
+/**
+ * @brief Set the source of interrupt (FIFO full, measurement values ready) with specified polarity
+ *
+ * @param intr_source Interrupt source as defined by Interrupt_source_3xx_e
+ * @param polarity
+ * @return status code
+ */
+int16_t dps3xx_set_interrupt_sources_with_polarity(struct Dps3xxDev *dps3xx_dev, uint8_t intr_source, uint8_t polarity);
 
-// virtual int16_t flushFIFO() = 0;
+/**
+ * Gets the results from continuous measurements and writes them to given arrays
+ *
+ * @param *tempBuffer:      The start address of the buffer where the temperature results are written
+ *                          If this is NULL, no temperature results will be written out
+ * @param &tempCount:       The size of the buffer for temperature results.
+ *                          When the function ends, it will contain the number of bytes written to the buffer.
+ * @param *prsBuffer:       The start address of the buffer where the pressure results are written
+ *                          If this is NULL, no pressure results will be written out
+ * @param &prsCount:        The size of the buffer for pressure results.
+ *                          When the function ends, it will contain the number of bytes written to the buffer.
+ * @param reg               The FIFO empty register field; needed since this field is different for each sensor (should be registers[FIFO_EMPTY] removed for combined code)
+ * @return  status code
+ */
+int16_t dps3xx_get_cont_results(struct Dps3xxDev *dps3xx_dev, float *tempBuffer, uint8_t *tempCount, float *prsBuffer, uint8_t *prsCount);
 
-// virtual float calcTemp(int32_t raw) = 0;
-
-// virtual float calcPressure(int32_t raw) = 0;
-
-#endif // DPSCLASS_H_INCLUDED
+#endif

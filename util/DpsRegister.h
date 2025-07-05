@@ -1,5 +1,5 @@
-#ifndef DPSREGISTER_H_INCLUDED
-#define DPSREGISTER_H_INCLUDED
+#ifndef DPSREGISTER_H_
+#define DPSREGISTER_H_
 
 #include <stdint.h>
 
