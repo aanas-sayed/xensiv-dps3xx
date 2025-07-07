@@ -88,6 +88,9 @@ static void dps3xx_init(struct Dps3xxDev *dev)
     LOG_DBG("Revision ID: %u", revId);
     dev->m_revisionID = revId;
 
+    // reset
+    dps3xx_reset(dev);
+
     // find out which temperature sensor is calibrated with coefficients...
     int16_t sensor = dps3xx_read_byte_bitfield(dev, registers[TEMP_SENSORREC]);
     LOG_DBG("Temperature sensor: %u", sensor);
@@ -202,6 +205,22 @@ void dps3xx_begin(struct Dps3xxDev *dev, uint8_t threeWire)
     }
 
     dps3xx_init(dev);
+}
+
+/**
+ * resets the sensor
+ *
+ * @return 	0 on success, -1 on fail
+ */
+int16_t dps3xx_reset(struct Dps3xxDev *dev)
+{
+    // switch to reset mode
+    if (dps3xx_write_byte_bitfield(dev, 0b1001, registers[SOFT_RESET], 0U) < 0)
+    {
+        return DPS__FAIL_INIT_FAILED;
+    }
+    k_msleep(100);
+    return 0;
 }
 
 /**

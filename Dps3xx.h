@@ -67,6 +67,8 @@ struct Dps3xxDev
     int32_t m_c1;
 };
 
+int16_t dps3xx_reset(struct Dps3xxDev *dev);
+
 /**
  * Standard SPI begin function
  *

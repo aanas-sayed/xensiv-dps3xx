@@ -26,6 +26,7 @@ enum Registers_e
     FIFO_FULL,      // FIFO full
     INT_HL,
     INT_SEL, // interrupt select
+    SOFT_RESET,
 };
 
 // Externs

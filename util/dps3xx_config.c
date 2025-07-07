@@ -12,6 +12,7 @@ const RegMask_t registers[DPS3xx_NUM_OF_REGMASKS] = {
     {0x0B, 0x02, 1}, // FIFO_FULL
     {0x09, 0x80, 7}, // INT_HL
     {0x09, 0x70, 4}, // INT_SEL
+    {0x0C, 0x0F, 0}, // SOFT_RESET
 };
 
 const RegBlock_t coeffBlock = {0x10, 18};
