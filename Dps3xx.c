@@ -11,9 +11,9 @@
 // Logging
 LOG_MODULE_REGISTER(dps3_class, CONFIG_LOCAL_DPS3_CLASS_LOG_LEVEL);
 
-/* Retrieve the SPI API-device structure */
-#define SPIOP SPI_WORD_SET(8) | SPI_TRANSFER_MSB
-struct spi_dt_spec dps3_spi = SPI_DT_SPEC_GET(DPS3_SPI_NODE, SPIOP, 0);
+/* Retrieve the SPI device structure */
+#define SPIOP (SPI_WORD_SET(8) | SPI_TRANSFER_MSB | SPI_MODE_CPHA | SPI_MODE_CPOL)
+const struct spi_dt_spec dps3_spi = SPI_DT_SPEC_GET(DPS3_SPI_NODE, SPIOP, 0);
 
 struct Dps3xxDev dps3xx_dev = {
     .scaling_facts = {524288, 1572864, 3670016, 7864320, 253952, 516096, 1040384, 2088960},
