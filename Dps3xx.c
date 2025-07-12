@@ -2,40 +2,12 @@
 #include "util/dps_config.h"
 #include "util/dps3xx_config.h"
 #include "util/DpsRegister.h"
-#include <zephyr/kernel.h>
-#include <zephyr/drivers/spi.h>
 #include <zephyr/logging/log.h>
 #include "../config.h"
 #include "../utils/spi_helper.h"
 
 // Logging
 LOG_MODULE_REGISTER(dps3_class, CONFIG_LOCAL_DPS3_CLASS_LOG_LEVEL);
-
-/* Retrieve the SPI device structure */
-#define SPIOP (SPI_WORD_SET(8) | SPI_TRANSFER_MSB | SPI_MODE_CPHA | SPI_MODE_CPOL)
-const struct spi_dt_spec dps3_spi = SPI_DT_SPEC_GET(DPS3_SPI_NODE, SPIOP, 0);
-
-struct Dps3xxDev dps3xx_dev = {
-    .scaling_facts = {524288, 1572864, 3670016, 7864320, 253952, 516096, 1040384, 2088960},
-    .m_opMode = IDLE,
-    .m_initFail = 1U,
-    .m_productID = 0U,
-    .m_revisionID = 0U,
-    .m_tempMr = 0U,
-    .m_tempOsr = 0U,
-    .m_prsMr = 0U,
-    .m_prsOsr = 0U,
-    .m_c00 = 0,
-    .m_c10 = 0,
-    .m_c01 = 0,
-    .m_c11 = 0,
-    .m_c20 = 0,
-    .m_c21 = 0,
-    .m_c30 = 0,
-    .m_lastTempScal = 0.0f,
-    .m_spibus = &dps3_spi,
-    .m_threeWire = 0U,
-};
 
 // Forward declarations
 static void dps3xx_init(struct Dps3xxDev *dev);

@@ -19,7 +19,7 @@
 #include "util/DpsRegister.h"
 
 extern struct Dps3xxDev dps3xx_dev;
-extern const struct spi_dt_spec dps3_spi;
+extern struct spi_dt_spec dps3_spi;
 /*!
  * @brief Dps3xx device structure
  */
