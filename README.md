@@ -16,8 +16,8 @@ Arduino library of Infineon's [**XENSIV™ Digital Pressure Sensors (DPS3xx)**](
         <td><img src="docs/img/dps368.png" height="80"></td>
     </tr>
     <tr>
-        <td style="test-align : center"><a href="https://www.infineon.com/cms/de/product/sensor/pressure-sensors/pressure-sensors-for-iot/dps310/">XENSIV™ DPS310</a></td>
-        <td style="test-align : center"><a href="https://www.infineon.com/cms/de/product/sensor/pressure-sensors/pressure-sensors-for-iot/dps368/">XENSIV™ DPS368</a></td>
+        <td style="text-align : center"><a href="https://www.infineon.com/cms/de/product/sensor/pressure-sensors/pressure-sensors-for-iot/dps310/">XENSIV™ DPS310</a></td>
+        <td style="text-align : center"><a href="https://www.infineon.com/cms/de/product/sensor/pressure-sensors/pressure-sensors-for-iot/dps368/">XENSIV™ DPS368</a></td>
     </tr>
     <tr>
         <td rowspan=2>Shield2Go</td>
@@ -25,8 +25,8 @@ Arduino library of Infineon's [**XENSIV™ Digital Pressure Sensors (DPS3xx)**](
         <td><img src="docs/img/dps368-shield2go.png" height="80"></td>
     </tr>
     <tr>
-        <td style="test-align : center"><a href="https://www.infineon.com/cms/en/product/evaluation-boards/s2go-pressure-dps310/">XENSIV™ DPS310 Shield2Go</a></td>
-        <td style="test-align : center"><a href="https://www.infineon.com/cms/en/product/evaluation-boards/s2go-pressure-dps368/">XENSIV™ DPS368 Shield2Go</a></td>
+        <td style="text-align : center"><a href="https://www.infineon.com/cms/en/product/evaluation-boards/s2go-pressure-dps310/">XENSIV™ DPS310 Shield2Go</a></td>
+        <td style="text-align : center"><a href="https://www.infineon.com/cms/en/product/evaluation-boards/s2go-pressure-dps368/">XENSIV™ DPS368 Shield2Go</a></td>
     </tr>
     <tr>
        <td rowspan=2>Kit 2Go</td>
@@ -34,8 +34,8 @@ Arduino library of Infineon's [**XENSIV™ Digital Pressure Sensors (DPS3xx)**](
         <td><img src="docs/img/dps368-kit2go.png" height="80"></td>
     </tr>
     <tr>
-        <td style="test-align : center"><a href="https://www.infineon.com/cms/en/product/evaluation-boards/kit_dps310_2go/">XENSIV™ DPS310 Kit 2Go</a></td>
-        <td style="test-align : center"><a href="https://www.infineon.com/cms/en/product/evaluation-boards/kit_dps368_2go/">XENSIV™ DPS368 Kit 2Go</a></td>
+        <td style="text-align : center"><a href="https://www.infineon.com/cms/en/product/evaluation-boards/kit_dps310_2go/">XENSIV™ DPS310 Kit 2Go</a></td>
+        <td style="text-align : center"><a href="https://www.infineon.com/cms/en/product/evaluation-boards/kit_dps368_2go/">XENSIV™ DPS368 Kit 2Go</a></td>
     </tr>
 </table>
 
